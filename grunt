@@ -1,0 +1,37 @@
+npm install -g grunt-cli
+//安装
+
+npm install grunt --save-dev
+//安装grunt开发工具
+
+
+
+配置Gruntfile.js文件：
+
+module.exports = function(grunt){
+
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	//加载能够提供“uglify”任务的插件
+
+	grunt.initConfig({
+
+		pkg: grunt.file.readJSON('package.json');
+		uglify: {
+		    options: {
+		      banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+		    },
+		    build: {
+		      src: 'src/<%= pkg.name %>.js',
+		      dest: 'build/<%= pkg.name %>.min.js'
+		    }
+		    // <%= %>可以引用任意的配置属性，因此可以通过这种方式来指定诸如文件路径和文件列表类型的配置数据，从而减少一些重复的工作。
+		 }
+
+	})
+
+};
+
+grunt uglify
+// 执行uglify任务
+
+
