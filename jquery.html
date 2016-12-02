@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="">
+  <style type="text/css">
+	
+	body {
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		padding: 0;
+		margin: 0;
+	}
+
+  	.top {
+  		width: 100px;
+  		height: 100px;
+  		float: left;
+  		border: 1px solid #000;
+  		background-color: red;
+  	}
+
+  	.foot {
+  		background-color: yellow;
+  	}
+
+  	.animateBox {
+  		width: 50px;
+  		height: 50px;
+  		border-radius: 50px;
+  		background-color: red;
+  		position: absolute;
+  		left: 0;
+  		top: 200px;
+
+  	}
+	
+	input:focus {
+		border: red 1px solid;
+		background: yellow
+	}
+
+  </style>
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js">
+</script>
+</head>
+<body>
+<div id="top"></div>
+<button id="first">append</button>
+<button id="second">prepend</button>
+<button id="pause">pause</button>
+<button id="checkRepeat">checkRepeat</button>
+
+
+<input class="textarea" type="text" value="请输入">
+<p>
+	<span>横坐标：</span>
+	<span class="pageX"></span>
+</p>
+<p>
+	<span>纵坐标：</span>
+	<span class="pageY"></span>
+</p>
+<div class="animateBox"></div>
+<div name='a'>
+	<div name='b' class="twice">
+		<div name='c'>
+			<p></p>
+		</div>
+	</div>
+</div>
+
+
+<input type="checkbox" name="items" value="足球">足球
+<input type="checkbox" name="items" value="篮球">篮球
+<input type="checkbox" name="items" value="排球">排球
+<input type="checkbox" name="items" value="羽毛球">羽毛球
+<button id="sure">确定</button>
+<button>全选／全不选</button>
+
+
+<select class="choose">
+	<option>1</option>
+	<option>2</option>
+	<option>3</option>
+	<option>4</option>
+	<option>5</option>
+</select>
+<button id="choose">choose</button>
+
+<script type="text/javascript">
+	$(function(){
+
+		$("#choose").click(function(){
+			var value = $(".choose").val();
+			console.log(value);
+		});
+
+		var a = "<p>"+"1"+"</p>";
+		var b = "<p>"+"2"+"</p>";
+		
+		$("#second").click(function(){
+			var zh = [];
+			var number = $("input").val().split("");
+			for(var i=0;i<number.length;i++){
+				if(isNaN(number[i])){
+					zh.push(number[i])
+				}
+			};
+			console.log(zh);
+
+		});
+
+		// $("#first").hover(function(){
+		// 	$("#second").hide();
+		// },function(){
+		// 	$("#second").show();
+		// });
+
+		//等同于下面👇
+
+		// $("#first").bind("mouseover",function(event){
+		// 	$("#second").hide();
+		// event.stopPropagation();
+		// event.preventDefault();
+		// }).bind("mouseout",function(){
+		// 	$("#second").show();
+		// });
+
+		//等同于下面👇
+
+		// $("#first").mouseover(function(){
+		// 	$("#second").hide(1000);
+		// }).mouseout(function(){
+		// 	$("#second").show(1000);
+		// });
+
+
+
+		// $("#first").mouseover(function(){
+		// 	$("#second").fadeOut(3000);
+		// }).mouseout(function(){
+		// 	$("#second").fadeIn(3000);
+		// });
+
+
+
+		$("#first").mouseover(function(){
+			$("#second").slideUp(3000);
+		}).mouseout(function(){
+			$("#second").slideDown(3000);
+		});
+
+		$("#second").toggle(function(){
+			$("#first").hide();
+		},function(){
+			$("#first").show();
+		});
+
+		
+
+
+		$(".textarea").focus(function(){
+			$("input").val("")
+		});
+
+		// $(".textarea").keydown(function(e){
+		// 	alert(e.which)
+		// });
+		//数字键0-9，对应的e.which是48-57，空格是32，回车是13
+
+		$("body").mousemove(function(event){
+			var pageX = event.pageX;
+			var pageY = event.pageY;
+			$(".pageX").html(pageX);
+			$(".pageY").html(pageY);
+		});
+
+		$("#first").one("click",function(){
+			alert("one!")
+		});
+		//没什么卵用
+
+		//animate( { 属性 : 值 } , 时间 , 回调函数 );
+
+
+		
+		fn();
+		// var animate = setInterval(fn,6000);
+		$("#pause").click(function(event){
+			if($(".animateBox").is(":animated")){
+				var positionX = String($(".animateBox").pageX+"px");
+				var positionY = String($(".animateBox").pageY+"px");
+				$(".animateBox").stop(true).animate({top:positionX,left:positionY});
+				clearInterval(animate);
+			}
+			
+		});
+
+
+		//选中项的问题
+
+		$("input:checkbox").click(function(){
+			$("[name=items]").removeAttr("checked");
+			$(this).attr("checked","true");
+
+		});
+
+	$("button:contains('确定')").click(function(){
+		
+		console.log($("input:checkbox[name=items]:checked")[0].value);
+	});
+
+	
+		 
+
+		
+
+
+	});
+	function fn(){
+		$(".animateBox").animate({"left":"300px"},1500).animate({"top":"400px"},1500).animate({"left":"0px"},1500).animate({"top":"200px"},1500)
+	};
+
+	//多个链式写就是依次执行动画
+
+	$("#checkRepeat").click(function(event){
+		var content = $(".textarea").val();
+		console.log(content.split(""));
+		event.stopPropagation();
+		event.preventDefault();
+	});
+	
+
+
+	
+
+	
+
+</script>
+</body>
+</html>

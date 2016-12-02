@@ -1,0 +1,48 @@
+node操作mongodb：
+
+1，查找：
+
+find({key:value})或者find({key1:value1, key2:value2})；
+//返回的是一个数组，符合条件的所有数据，所以后面常接toArray();
+
+req.db.collection("form_insts").find({"_id": {$in: ids}}).toArray(function (err, data) {
+    if (err) return next(error(500, err));
+	res.status(200).json(data)
+});
+
+
+findOne({key:value},function(err,data){
+	if (err) return next(err(500, err));
+	res.status(200).json(data)
+});
+
+//查找数据库里第一条符合的；
+
+
+function getWorkOrder(req, res, next) {
+        req.db.collection("form_insts").findOne({"_id": new ObjectID(req.body.id)}, function (err, wo) {
+            if (err) return next(error(500, err));
+            if (wo) {                  
+                res.status(200).json(wo);                                   
+            }
+            else {
+                res.status(400).json({message: "工单不存在"});
+            }
+        });
+    }
+//注意：_id是mongodb自动生成的，所以要用new ObjectId()方法转换成Bson形式；
+
+2, 
+
+
+nodejs框架 express使用：
+
+var express = require(‘express’);
+var app = express();
+//最顶层调用express方法
+
+app.get(‘/’,function(req, res){
+	res.send(‘hello world’)
+});
+
+app.listen(3000);

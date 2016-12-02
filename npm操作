@@ -1,0 +1,12 @@
+npm install
+// 下载dependency里面的node module, 生成node module包
+
+npm init
+// 生成package.json文件到当前目录下
+
+npm install xxx --save-dev
+// 下载xxx并加入devdependency目录下
+
+npm install xxx --save
+// 下载xxx并加入dependency目录下，devdependency是开发时所依赖的包，dependency是运行时所依赖的包，后者必须加载，前者不需要npm install
+
