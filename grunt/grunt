@@ -37,3 +37,8 @@ grunt uglify
 执行多个任务：
 grunt uglify:builda
 grunt uglify:buildb
+
+
+grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);
+
+上面的任务别名案例中定义了一个 'default' 任务，如果运行Grunt时没有指定任何任务，它将自动执行'jshint'、'qunit'、'concat' 和 'uglify' 任务。
