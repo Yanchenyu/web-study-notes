@@ -1,4 +1,4 @@
-cordova create hello com.example.helloHelloWorld
+cordova create hello com.example.hello HelloWorld
 分解
 cordova create        代表phonegap工程的创建命令
 hello 代表  phonegap工程名

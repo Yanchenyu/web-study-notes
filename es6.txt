@@ -1,4 +1,4 @@
-1，let，const
+一，let，const
 块级作用域。
 let a = 1;
 if(true){
@@ -58,6 +58,23 @@ function f(){ console.log(“a”) };
 }
 
 
+function func(arg){
+	let arg;  //报错
+	{
+		let arg; //不报错，因为块级作用域
+	}
+}
+
+死区：
+function bar(x=y,y=2){
+	return x+y
+};
+bar();   //报错，因为参数x默认值等于另一个参数y，而此时y还没有声明，属于“死区”
+
+
+
+
+
 const声明的变量不得改变值，这意味着，const一旦声明变量，就必须立即初始化，不能留到以后赋值。
 const foo;    // error
 
@@ -70,26 +87,251 @@ if(true){
 max;  //error
 min;  //error
 
-const声明的常量，也与let一样不可重复声明。
+const声明的常量，也与let一样不可重复声明。也不能写两次let min或者两次const max，也不能再写var min或var max。都会报错。
+
+
+ES6一共有6种声明变量的方法：var , function , let , const , import , class 。
+在ES5中，顶层对象的属性是与全局变量挂钩的，例如：
+var a = 1;
+window.a;    // 1;
+
+但是在ES6中，两者脱钩：
+let b = 2;
+window.b;   // undefined;
+
+浏览器中顶层对象是window，而Node和Web Workder中没有window；
+浏览器和Web Workder里面，self指向顶层对象，但是Node中没有self；
+Node中顶层对象是global，但其他环境都不支持。
 
 
 
 
 
+二，变量的解构赋值
+
+1，数组的解构赋值：
+
+var a = 1,b = 2,c = 3;
+//ES6中等同于
+var [a,b,c] = [1,2,3];
+//只要两边都为数组形式，且格式一样就能进行模式匹配，如果不匹配，未匹配到部分的就是undefined，如：
+
+let [x,[y],z] = [1,[2,3],4];
+x  // 1
+y  // 2
+z  // 4
+
+
+解构赋值可以有默认值，只要声明的值为undefined就为默认值；
+let [ x = 1 ,y = 1 ] = [2];
+x  // 2;
+y  // 1;
+
+let [x = 1 , y = x] = [2];
+x  // 2;
+y  // 2;
+
+let [x = y, y = 1] = [];     // ReferenceError
+//x用默认值y的时候，y还没有声明
+
+
+
+2，对象的解构赋值：
+
+var {a,b} = {a:1 ,b:2};
+//区别于数组解构赋值，对象解构赋值和先后顺序无关，只匹配变量名，必须相同才能取到
+
+var { foo: baz } = { foo: 'aaa', bar: 'bbb' };
+baz // "aaa"
+foo // error: foo is not defined
+真正赋值的是后者，不是前者
+
+注意，采用这种写法时，变量的声明和赋值是一体的。对于let和const来说，变量不能重新声明，所以一旦赋值的变量以前声明过，就会报错。
+
+let foo;
+let {foo} = {foo: 1}; // SyntaxError: Duplicate declaration "foo"
+
+let baz;
+let {bar: baz} = {bar: 1}; // SyntaxError: Duplicate declaration "baz"
+上面代码中，解构赋值的变量都会重新声明，所以报错了。不过，因为var命令允许重新声明，所以这个错误只会在使用let和const命令时出现。如果没有第二个let命令，上面的代码就不会报错。
+
+let foo;
+({foo} = {foo: 1}); // 成功
+
+let baz;
+({bar: baz} = {bar: 1}); // 成功
+
+上面代码中，let命令下面一行的圆括号是必须的，否则会报错。因为解析器会将起首的大括号，理解成一个代码块，而不是赋值语句。
+
+对象解构赋值也有默认值，用法和数组一样
+
+
+3，字符串的解构赋值：
+const [a,b,c] = “123”;
+a  //1
+b  //2
+c  //3
+
+let {length : len} = 'hello';
+len // 5
+
+
+4，数值和布尔值的解构赋值：
+
+解构赋值时，如果等号右边是数值和布尔值，则会先转为对象。
+
+let {toString: s} = 123;
+s === Number.prototype.toString // true
+
+let {toString: s} = true;
+s === Boolean.prototype.toString // true
+上面代码中，数值和布尔值的包装对象都有toString属性，因此变量s都能取到值。
+
+解构赋值的规则是，只要等号右边的值不是对象，就先将其转为对象。由于undefined和null无法转为对象，所以对它们进行解构赋值，都会报错。
+
+
+5，函数参数的解构赋值：
+
+[[1,2],[3,4]].map(([x,y]) => x+y);
+// [3,7]
+
+
+6，圆括号的使用：
+只有赋值语句的非模式部分，才可以使用，其他都报错：
+[(b)] = [3];
+({p: (d)} = {});
 
 
 
 
+三，字符串的扩展
+
+1，字符串的遍历器接口 for…of：
+
+for (let codePoint of 'foo') {
+  console.log(codePoint)
+}
+// "f"
+// "o"
+// "o"
+
+2，确定一个字符串是否包含在另一个字符串中：
+
+includes()：返回布尔值，表示是否找到了参数字符串。
+startsWith()：返回布尔值，表示参数字符串是否在源字符串的头部。
+endsWith()：返回布尔值，表示参数字符串是否在源字符串的尾部。
+
+var s = 'Hello world!';
+
+s.startsWith('Hello') // true
+s.endsWith('!') // true
+s.includes('o') // true
+这三个方法都支持第二个参数，表示开始搜索的位置。
+
+var s = 'Hello world!';
+
+s.startsWith('world', 6) // true
+s.endsWith('Hello', 5) // true
+s.includes('Hello', 6) // false
+上面代码表示，使用第二个参数n时，endsWith的行为与其他两个方法有所不同。它针对前n个字符，而其他两个方法针对从第n个位置直到字符串结束。
+
+3，repeat();
+
+repeat方法返回一个新字符串，表示将原字符串重复n次。
+
+'x'.repeat(3) // "xxx"
+'hello'.repeat(2) // "hellohello"
+'na'.repeat(0) // ""
+参数如果是小数，会被取整。
+
+'na'.repeat(2.9) // "nana"
+
+如果是0～-1之间，则等同于0，转换为””，NaN也为空，非数字也为空
+
+
+4，模板字符串：
+
+传统的JavaScript语言，输出模板通常是这样写的。
+
+$('#result').append(
+  'There are <b>' + basket.count + '</b> ' +
+  'items in your basket, ' +
+  '<em>' + basket.onSale +
+  '</em> are on sale!'
+);
+上面这种写法相当繁琐不方便，ES6引入了模板字符串解决这个问题。
+
+$('#result').append(`
+  There are <b>${basket.count}</b> items
+   in your basket, <em>${basket.onSale}</em>
+  are on sale!
+`);
+
+如果使用模板字符串表示多行字符串，所有的空格和缩进都会被保留在输出之中。
+
+$('#list').html(`
+<ul>
+  <li>first</li>
+  <li>second</li>
+</ul>
+`);
+上面代码中，所有模板字符串的空格和换行，都是被保留的，比如<ul>标签前面会有一个换行。如果你不想要这个换行，可以使用trim方法消除它。
+
+$('#list').html(`
+<ul>
+  <li>first</li>
+  <li>second</li>
+</ul>
+`.trim());
+模板字符串中嵌入变量，需要将变量名写在${}之中，模板字符串中的变量一定要先声明，不然会报错
 
 
 
 
+四，数值的扩展
+
+1，ES6提供了二进制和八进制数值的新的写法，分别用前缀0b（或0B）和0o（或0O）表示。如果要将0b和0o前缀的字符串数值转为十进制，要使用Number方法。
+
+2，Number.isNaN(object); 判断是否为NaN，区别于ES5的isNaN(object)方法是，传统方法先调用Number()将非数值的值转为数值，再进行判断，而这两个新方法只对数值有效，非数值一律返回false。
+例如：
+isFinite(25) // true
+isFinite("25") // true
+Number.isFinite(25) // true
+Number.isFinite("25") // false
+
+isNaN(NaN) // true
+isNaN("NaN") // true
+Number.isNaN(NaN) // true
+Number.isNaN("NaN") // false
+
+
+3，ES6将全局方法parseInt()和parseFloat()，移植到Number对象上面，行为完全保持不变。
+
+// ES5的写法
+parseInt('12.34') // 12
+parseFloat('123.45#') // 123.45
+
+// ES6的写法
+Number.parseInt('12.34') // 12
+Number.parseFloat('123.45#') // 123.45
+这样做的目的，是逐步减少全局性方法，使得语言逐步模块化。
+
+Number.parseInt === parseInt // true
+Number.parseFloat === parseFloat // true
+
+
+4，Number.isInteger()
+Number.isInteger()用来判断一个值是否为整数。需要注意的是，在JavaScript内部，整数和浮点数是同样的储存方法，所以3和3.0被视为同一个值。
+
+Number.isInteger(25) // true
+Number.isInteger(25.0) // true
+Number.isInteger(25.1) // false
+Number.isInteger("15") // false
+Number.isInteger(true) // false
 
 
 
-
-
-
+5，Math.trunc(num)，去除小数部分，全部去除，留整数，非四舍五入。
 
 
 

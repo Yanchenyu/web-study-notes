@@ -6,3 +6,6 @@ npm install webpack --save-dev
 
 npm install webpack-dev-server --save-dev
 //webpack的开发工具
+
+webpack-dev-server --inline
+//打开localhost:8080，实时监控刷新
