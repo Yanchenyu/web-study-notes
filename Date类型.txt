@@ -1,0 +1,10 @@
+var date = new Date(); //获得当前的GMT时间；
+var time = date.getTime(); //获得当前的时间戳；
+var nowTime = new Date(time); 
+nowTime.getFullYear();  //获得完整的年份；
+nowTime.getMonth()+1;   //获得完整的月份，因为月是0-11，所以要+1；
+nowTime.getDate();   //返回日；
+nowTime.getDay()+1;    //返回星期几，因为是0-6；
+nowTime.getHours();   //返回小时数，0-23；
+nowTime.getMinutes();  //分钟，0-59；
+nowTime.getSeconds();  //秒，0-59；

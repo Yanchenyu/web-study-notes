@@ -1,0 +1,68 @@
+1，迭代方法：
+function factorial(num){
+	if(num<=1){
+		return 1;	
+	}else{
+		return num * arguments.callee(num-1)
+	}
+}
+
+2，call和apply的异同：
+相同：都是在特定的作用域中调用函数，实际上等于设置函数体内this对象的值，扩充函数作用域；
+不同：apply()接受两个参数，一个作用域，一个参数数组（也可以是arguments），   apply(this, [array]);
+     call()接受两个参数，一个作用域，一个所有参数实例，要列出来
+
+还有一个方法，是bind()，例：
+window.color = ‘blue’;
+var o = {color: ‘red’};
+function sayColor(){
+	alert(this.color)
+};
+
+sayColor();   //blue
+
+var objectSayColor = sayColor.bind(o);
+objectSayColor();   // red;
+
+
+3，toFixed()方法，显示几位小数；
+num.toFixed(2);  
+
+4，字符串检索：
+indexOf()，lastIndexOf()，参数是要查找的字符，返回的是位置，两者的区别，前者从前往后检索，后者从后往前，不过索引值都是从前往后数；
+
+5，trim()，删除前后空格
+
+
+
+6，Math对象: 
+
+Math.min(3,53,21,11);  //3
+Math.max(3,41,53,12);  //53
+
+//注意，上述的参数全部是数值参数，不是一个数组，如果需要在数组中找最大或最小值怎么办，看下面：
+
+var values = [2,123,42,52]
+var max = Math.max.apply(Math,values);
+
+舍入方法：
+Math.ceil() ,向上舍入
+Math.floor() ,向下舍入
+Math.round()  ,标准舍入
+
+Math.random(),   [0,1)之间的随机数
+
+如果想选择一个1到10的随机数：
+var num = Math.floor(Math.random() * 10 + 1);
+
+如果想选择一个1到10的整数：
+parseInt(num);
+
+
+Math.abs(num)   ,绝对值
+
+
+
+
+
+
