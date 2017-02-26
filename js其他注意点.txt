@@ -25,6 +25,10 @@ var objectSayColor = sayColor.bind(o);
 objectSayColor();   // red;
 
 
+
+caller 返回一个调用当前函数的引用 如果是由顶层调用的话 则返回null;
+
+
 3，toFixed()方法，显示几位小数；
 num.toFixed(2);  
 

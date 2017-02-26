@@ -31,8 +31,547 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 
 
 4，执行环境以及作用域的问题：
-	执行环境定义了变量或函数有权访问的其他数据（这里的变量或函数可能是外部环境的，也可能是当前执行环境的）。每个执行环境有一个对应的变量对象，这里面存储了在该环境下定义的所有变量和函数。执行环境中所有的代码执行完毕后，当前环境就会销毁，全剧执行环境直到应用程序退出时才会销毁。
+	执行环境定义了变量或函数有权访问的其他数据（这里的变量或函数可能是外部环境的，也可能是当前执行环境的）。每个执行环境有一个对应的变量对象，这里面存储了在该环境下定义的所有变量和函数。执行环境中所有的代码执行完毕后，当前环境就会销毁，全局执行环境直到应用程序退出时才会销毁。
 	每个函数都有自己的执行环境，执行流进入一个函数时，函数当前的执行环境被推入环境栈中，此时控制权就由原来的执行环境而移交给当前执行环境下，当函数执行完毕后，栈就会将这个环境推出，控制权也重新回到原来的执行环境下。每一个正在执行的环境都放在环境栈里面。ECMAScript的执行流就是这个机制。
-	当代码在一个环境中执行的时候，就会创建一个变量对象的作用域链，这个作用域链的用途是保证对所有能够在当前执行环境下有权访问的变量或函数的有序访问。（换句话说，在当前执行环境下，有哪些变量或函数是可以访问的，我通过作用域链就可以查到，而且是有序的查找）。这个作用域链的前端，是当前执行环境的变量对象。如果这个执行环境是函数，则将其活动对象作为变量对象。活动对象起初只有一个变量，就是arguments对象（全局环境中没有的）。作用域链上，从前端开始往后，下一个变量对象就是当前执行环境外的环境下的变量对象，再下一个就是再外一层环境的变量对象，（这个环境一层层的，就是执行流依次经过的环境，只不过是倒过来，从前往后的，从里到外），一直到最外层的全局执行环境：全局执行环境的变量对象一定是作用域链的最后一个对象。
+	当代码在一个环境中执行的时候，就会创建一个变量对象的作用域链，这个作用域链的用途是保证对所有能够在当前执行环境下有权访问的变量或函数的有序访问。（换句话说，在当前执行环境下，有哪些变量或函数是可以访问的，我通过作用域链就可以查到，而且是有序的查找，所以我认为其实作用域链就是变量对象的排序）。这个作用域链的前端，是当前执行环境的变量对象。如果这个执行环境是函数，则将其活动对象作为变量对象。活动对象起初只有一个变量，就是arguments对象（全局环境中没有的）。作用域链上，从前端开始往后，下一个变量对象就是当前执行环境外的环境下的变量对象，再下一个就是再外一层环境的变量对象，（这个环境一层层的，就是执行流依次经过的环境，只不过是倒过来，从前往后的，从里到外），一直到最外层的全局执行环境：全局执行环境的变量对象一定是作用域链的最后一个对象。
 	标识符的解析就是沿着作用域链从前往后找的。
+	作用域链本质上是一个指向变量对象的指针列表，他只引用但不实际包含变量对象。    ——节选自闭包一节。
+
+
+第6章 面向对象的程序设计
+
+1，ECMAScript不像其他面向对象的语言那样有类的概念，它的对象与其他不同。
+
+2，ECMAScript有两种属性：数据属性和访问器属性。（[[]]这种双中括号表示属性为内部属性，外部不可直接访问）
+	1.数据属性：[[ Configurable ]]：表示能否通过delete删除属性，能否修改属性的特性，能否将属性修改为访问器属性，默认为true。
+		         [[ Enumerable ]]：表示能否通过for-in循环返回属性，默认为true。
+		         [[ Writable ]]：表示能否修改属性的值，默认为true。
+	  	         [[ Value ]]：包含这个属性的数据值，默认undefined。
+	要修改上述属性，必须用Object.defineProperty()方法，接收三个参数：属性所在的对象，属性的名字和描述符对象（就是上述4个属性名）
+
+	2.访问器属性：[[ Configurable ]]：表示能否通过delete删除属性，能否修改属性的特性，能否将属性修改为数据属性，默认为true。
+		         [[ Enumerable ]]：表示能否通过for-in循环返回属性，默认为true。
+		         [[ Get ]]：在读取属性时调用的函数，默认为undefined。
+	  	         [[ Set ]]：再写入属性时调用的函数，默认为undefined。
+	也是必须用Object.defineProperty()方法来定义
+
+3，创建对象的几种模式：
+	1.工厂模式：
+	function createPerson(name, age, job){
+		var o = new Object();
+		o.name = name;
+		o.age = age;
+		o.job = job;
+		o.sayName = function(){
+			alert(name)
+		};
+		return o
+	}
+
+	var person = createPerson(“Nical”, 24, “Engineer”);
+
+	缺点：1，无法确定对象的类型（都是Object）;
+	         2，创建的多个对象之间没有联系
+
+	2，构造函数模式：
+	function Person(name, age, job){
+		this.name = name;
+		this.age = age;
+		this.job = job;
+		this.sayName = function(){
+			alert(name)
+		}
+	}
+
+	var person = new Person(“Nical”, 24, “Engineer”);
+
+	缺点：①多个实例重复创建方法，无法共享。
+　　   	          ②多个实例都有sayName方法，但均不是同一个Function的实例。
+
+	3，原型模式：
+	function Person(){} 
+
+  	Person.prototype.name = 'Nical';
+ 	Person.prototype.age = 24;
+	Person.prototype.job = 'Engineer';
+  	Person.prototype.sayName = function(){
+    		alert(this.name);
+  	}
+ 
+	var person = new Person();
+
+	缺点：①无法传入参数，不能初始化属性值。
+　　  	          ②如果包含引用类型的值时，改变其中一个实例的值，则会在所有实例中体现。 
+
+
+
+
+
+===========================================================================
+
+（理解原型对象：
+
+	只要创建了一个函数(Person)，就会为这个函数(Person)自动创建一个prototype属性，这个属性指向该函数的原型对象。这个原型对象会自动获得一个constructor(构造函数)属性，指向该函数(Person)。
+	
+	Person.prototype.constructor === Person;  //true
+	var person1 = new Person();
+	person1.constructor === Person;  //true
+	为什么person1也有constructor属性指向Person，因为继承了原型对象。
+
+	字符表示：
+	Person.prototype  ——> Person Protottype(原型对象)，Person Protottype(原型对象).constructor  ——>Person
+	
+	这里我的理解就是，指向的意思其实就是代表是，Person.prototype就是Person的原型对象，所以原型对象的constructor属性指向函数，就是
+	Person.prototype.constructor === Person;   //true
+
+	
+	构造函数创建之后，它的原型对象只有一个constructor属性，其他属性都是从Object那里继承来的。此时，用构造函数创建一个实例，比如
+	var person1 = new Person()；
+	此时实例的内部包含一个指针(内部属性)，指向构造函数的原型对象，注意，不是构造函数Person，而是Person的原型对象(Person Prototype)，在FireFox，Safari，chrome浏览器里，这个指针叫__proto__，再三注意，这个连接是实例与构造函数的原型对象之间的，不是实例与构造函数之间的。所以当我们想为实例添加属性的时候，不用在构造函数里添加，而是直接在原型对象里添加，就是	Person.prototype.name = 'Nical';
+ 	Person.prototype.age = 24;
+	Person.prototype.job = 'Engineer';
+此时person1.name = “Nical” 
+
+	判断一个原型对象是否是某个实例的原型，用isPrototypeOf()，这个方法可以确定该实例是否存在内部属性，指向该原型
+	Person.prototype.isPrototypeOf(person1);    // true
+	
+ 	一个实例的原型，如何知道，用Object.getPrototypeOf()，返回值就是原型对象。
+	Object.getPrototypeOf(person1);     //Person.prototype
+	
+	以上两个方法传的参数都是实例。
+
+	代码在读取某个对象的属性值的时候，先查找该实例对象是否包含该属性，如果有就返回该属性值，如果没有，直接查找该实例所对应的构造函数的原型对象是否包含该属性，如果有就返回该属性值。如果实例中存在和原型对象中同名属性，则会自动屏蔽原型中的属性，但不会修改原型中的属性。
+
+	如何判断对象的某个属性是否是对象自身添加的还是原型中的？用hasOwnProperty()：
+	person1.hasOwnProperty(“name”);    //false
+	
+	注意：如果在实例中新定义了一个和原型中同名的属性，那么hasOwnProperty会返回true。
+
+	如何判断通过对象能够访问某个属性？用in方法：
+	“name” in person1；    	//true
+
+	如何判断某个对象的属性是否只是他的原型中的，而不是实例中的？
+
+	function hasPrototypeProperty( object ,  name ){
+		return (!object.hasOwnProperty(name))&& (name in object)
+	}
+	注意，如果新定义了一个和原型中同名的属性，则改值会返回false
+
+	几种访问对象属性的方法，注意他们的区别：
+		1，for-in循环返回的是能通过对象访问的、可枚举的属性。
+		2，Object.keys()返回的是仅仅是当前对象的自身属性、并且是可枚举的所有属性的字符串数组。
+		3，Object.getOwnPropertyNames()返回的是仅仅是当前对象的自身属性、并且是可枚举和不可枚举的所有属性的字符串数组。
+	这个一定要用例子来说明：
+	
+	function Person(){};
+	Person.prototype.name = ‘Nical’;
+	var person1 = new Person();
+	person1.age = 12;
+	
+	for(var a in person){
+		console.log(a)
+	};
+	// age 
+	// name
+
+	for(var b in Person){
+		console.log(b)
+	};
+	//
+
+	for(var c in Person.prototype){
+		console.log(c)
+	}
+	// name
+
+	Object.keys(person1);
+	// [‘age’];
+
+	Object.keys(Person);
+	// [];
+
+	Object.keys(Person.prototype)
+	// [“name"]
+
+	Object.getOwnPropertyNames(person1);
+	// [‘age’]
+
+	Object.getOwnPropertyNames(Person);
+	// ["length", "name", "arguments", "caller", "prototype"]
+
+	Object.getOwnPropertyNames(Person.prototype)
+	// [“constructor", "name"]
+
+	关于原型对象的重写问题，下面我用一个较长的例子来解释一下，这里面有些坑要注意：
+
+	function Person(){};
+	Person.prototype = {
+		name: ‘Nical’
+	};
+	//这里重写了Person的原型对象，此时，Person原型对象的构造函数属性已经不再指向Person了，同样，由Person新建的实例的构造函数属性也不再指向Person了，二者的constructor属性都指向Object了。
+	Person.prototype.constructor === Person;     //false
+	Person.prototype.constructor === Object;     //true
+	var person1 = new Person();
+	person1.constructor === Person;    //false
+	person1.constructor === Object;    //true
+
+	那么如果我要让constructor属性指向Person呢，很简单，在原型对象里面强行添加constructor属性，并赋给Person，接着上面的例子：
+	Person.prototype = {
+		constructor: Person,
+		name: ‘Tom’
+	}
+	var person2 = new Person();
+	Person.prototype.constructor === Person;  //true
+	person2.constructor === Person；//true
+	
+	但是此时的person1和person2的原型已经不是同一个了，所以
+	person1.name;    // ‘Nical’
+
+	上面直接在原型中添加constructor属性会导致他的[[Enumerable]]特性为true，但是原生的constructor属性是不可枚举的，所以我们要用Object.defineProperty()方法来修改constructor属性，具体的传参在上面第6章第2节里面有：
+	Object.defineProperty( Person.prototype , ’constructor’, {
+		enumerable: false,
+		value: Person
+	});
+
+	如果实例新建后，再给实例的构造函数的原型对象添加属性或方法，实例还是可以访问到新增的属性或方法，原因是实例与原型之间的松散连接关系，他们之间的连接是一个指针（__proto__），而不是副本。但是如果原型对象是重写的，那么这个指针就指不到新的原型对象了，所以那些新增的属性或方法在实例中就不可访问了(这里的实例是指重写之前建立的实例，他们访问的还是最初的原型，如果实例是在重写之后，那么还是可以访问到的)。
+	
+
+
+）
+
+===========================================================================
+
+	
+	回到原型模式的问题，他的缺点我用一个实例来说明：
+
+	function Person(){};
+	Person.prototype = {
+		name: ’Nical’,
+		friends: [‘a’ , ‘b’, ‘c’]
+	}
+	var person1 = new Person();
+	var person2 = new Person();
+	person1.name = ‘Sam’;
+	person1.friends.push(‘d’);
+	
+	person2.name;   //’Nical’;
+	person2.friends;  //[‘a’ ,’b’, ‘c’, ‘d’];
+
+	如果一个实例修改了属性是基本类型的，那么不会影响到其他实例，但是如果一个实例修改了属性是引用类型的，那么其他的也会受影响。这里的属性都是指的是原型中的属性，不是构造函数中的属性（补充一下，如果是构造函数中的属性，不管修改的是什么类型，其他实例都不会受影响，具体案例看下面那个），实例中没有的，如果是实例本身的属性或者是与原型对象中同名的属性，那么无论修改的属性是什么类型，都不会受影响。
+
+
+	
+
+	4，组合使用构造函数模式和原型模式
+
+	function Person(name , age, job){
+		this.name = name;
+		this.age = age;
+		this.job = job;
+		this.friends = [‘a’, ‘b’, ‘c’];
+	}
+
+	Person.prototype = {
+		constructor: Person,
+		sayName: function(){
+			alert(this.name)
+		}
+	};
+
+	var person1 = new Person(‘Nical’, 29, ‘Engineer’);
+	var person2 = new Person(‘Greg’, 27, ‘Doctor’);
+
+	person1.friends.push(“d”);
+	person1.friends;	// [‘a’, ‘b’, ‘c’, ‘d’];
+	person2.friends;  	// [‘a’, ‘b’, ‘c’];
+
+	因为这里friends的属性是在构造函数里定义的，所以某个实例改变它，其他实例不改变。
+
+
+	5，动态原型模式
+
+	function Person(name , age, job){
+		this.name = name;
+		this.age = age;
+		this.job = job;
+		if( typeof this.sayName != “function” ){
+			Person.prototype.sayName = function(){
+				alert(this.name)
+			}
+		}
+	}
+	
+	可以通过检查某个应该存在的方法是否有效，来决定是否需要初始化原型。
+
+	6，寄生构造函数模式
+
+	
+	function Person(name, age, job){
+		var o = new Object();
+		o.name = name;
+		o.age = age;
+		o.job = job;
+		o.sayName = function(){
+			alert(this.name)
+		};
+		return o
+	}
+
+	var person = new Person(“Nical”, 24, “Engineer”);
+
+	//不推荐使用
+
+
+	7，稳妥构造函数模式
+
+	function Person(name, age, job){
+		var o = new Object();
+
+		//在这边定义私有变量和函数
+
+		o.sayName = function(){
+			alert(name)
+		};
+
+		return o;
+	}
+
+	这种方法能保证除了sayName方法外，没有别的方式可以访问到其他数据成员。
+
+
+
+4，继承
+
+	ECMAScript只支持实现继承，主要是依靠原型链实现继承。
+
+=============	
+
+	1，原型链
+	
+	每一个构造函数都有一个prototype属性，指向他的原型对象，原型对象又有一个constructor属性，指向构造函数，构造函数生成的实例，又有一个内部属性（__proto__），指向它的构造函数的原型对象。如果这时候将原型对象作为另一个构造函数的实例，则这个实例（原型对象）又会有一个指针（__proto__）指向该实例（原型对象）的原型对象，而这个实例（原型对象）的原型对象又会有一个constructor属性，指向该实例（原型对象）的构造函数，该实例（原型对象）又会有一个prototype属性指向实例（原型对象）的原型对象。原型链就是实例和原型的链条。
+	
+	function Person1(){};
+	var person1 = new Person1();
+	function Person2(){};
+	Person1.prototype = new Person2();
+	
+
+	Person1.prototype.__proto__ === Person2.prototype;   // true
+	Person1.prototype.constructor === Person1;   //false，因为Person1的prototype重写了。
+	person1.constructor === Person1;  // true，因为此时Person1的原型对象已经不是最初的了，所以person1不会继承新的原型对象，所以它的constructor还是指向Person1；
+
+	这是跟写法有关的，如果我们换一种写法：
+
+	function A(){};
+	function B(){};
+	A.prototype = new B();
+	var a = new A();
+
+	A.prototype.constructor === B;   //true
+	a.constructor === B;   //true
+	a.__proto__ === A.prototype;   //true
+	A.prototype.__proto__ === B.prototype;   //true
+	a.__proto__.__proto__ === B.prototype;   // true
+
+	此时的A.prototype已经被重写了，所以a和A原型对象的constructor属性都指向B，而不是A；所谓的继承就是A的原型对象会继承构造函数B的原型对象的所有方法和属性。所以搜索一个实例的属性，三步：1，先在该实例中寻找该属性，2，如果没有则会在该实例的构造函数的原型对象中搜索，3，如果没有则会在该实例的原型对象的构造函数的原型对象中搜索。
+
+	默认的原型：
+	所有引用类型都继承了Object的方法，这也是通过原型链来实现的，所有函数的原型对象默认都是Object的实例，当然也会继承，所以上面的代码可以接着写：
+	
+	B.prototype.__proto__ === Object.prototype;   // true;
+	var b = new B();
+	b.__proto__.__proto__ === Object.prototype;   //true;
+	a.__proto__.__proto__.__proto__ === Object.prototype; 	// true
+
+	b.constructor === B;     // true
+	B.prototype = new Object();
+	b.constructor === B;     // true
+	B.prototype.constructor === B;    //false
+	B.prototype.constructor === Object;    //true	
+
+	var c = new B();
+	c.constructor === Object;    //true
+	这里的结果解释同上，如果重写了prototype，则直接指向上一层原型
+
+	原型链的两个问题：
+	1，之前我们提到了如果原型属性中有引用类型的值被实例修改了，那么所有的实例都会被改变，但是如果是构造函数里面定义的属性，不管是引用类型还是基本类型，怎么修改都不会改变。但是如果是通过原型来继承，那么构造函数里的属性就会变成下一个原型的属性，所以如果修改它，还是会影响到下一个原型的实例。一个例子说明：
+	function SuperType(){
+		this.colors = [‘red’,’blue’,’yellow’];
+	}
+	function SubType(){
+	}
+	SubType.prototype = new SuperType();
+	var  instance1 = new SubType();
+	instance1.colors.push(‘black’);
+	instance1.colors;      //‘red’,’blue’,’yellow’,’black’
+	var instance2 = new SubType();
+	instance2.colors;      //‘red’,’blue’,’yellow’,’black’
+	
+	上面的instance1修改的属性虽然是SuperType的构造函数里的属性，但是此时已经继承给了SubType的原型了，所以相当于修改了原型的引用类型的属性，因此所有的实例都会被修改
+	
+	2，在创建子类型的实例的时候，无法向超类型的构造函数传递参数，因为会影响到所有的实例。主要是引用类型的属性的修改
+
+=============	
+
+
+	2，借用构造函数
+	针对上面的两个问题，用一种借用构造函数的方法可以暂时避免：
+
+	function SuperType(){
+		this.colors = [“red”,”blue”,”green”]
+	}
+	function SubType(){
+		SuperType.call(this);
+	}
+	var  instance1 = new SubType();
+	instance1.colors.push(‘black’);
+	instance1.colors;      //‘red’,’blue’,’green’,’black’
+	var instance2 = new SubType();
+	instance2.colors;      //‘red’,’blue’,’green’	
+
+	这里的instance2没有收到影响，因为这里相当于把SuperType里的属性继承过来（复制），每一个新生成的实例都有一个colors的副本，所以互不影响。
+
+	但是也有一个问题，所有定义的属性都要在构造函数SubType里定义，这样就没有函数的可复用性了，看下一个例子：
+
+	function SuperType(name){
+		this.name = name
+	}
+	function SubType(){
+		SuperType.call(this, ‘Nical’);
+		this.age = ’29’
+	}
+	var instance = new SubType();
+	instance.name;     //Nical
+	instance.age;      //29
+
+	在这里我无法给SubType传参，返回的name和age都是统一的，如果要修改只能在构造函数里修改，这样太麻烦了，所以我们很少用这个方法
+
+
+==============
+
+	3，组合继承
+	针对上面的问题，我们将原型链和借用构造函数两个方法结合，可以得到我们想要的：
+	function SuperType(name){
+		this.name = name;
+		this.colors = [“red”,”blue”,”green”]
+	}
+	SuperType.prototype.sayName = function(){
+		alert(this.name)
+	}
+	function SubType(name, age){
+		SuperType.call(this, name);
+		this.age = age;
+	}
+	SubType.prototype = new SuperType();
+	SubType.prototype.constructor = SubType;
+	SubType.prototype.sayAge = function(){
+		alert(this.age)
+	}
+	var  instance1 = new SubType(‘Nical’, 29);
+	instance1.colors.push(‘black’);
+	instance1.colors;      //‘red’,’blue’,’green’,’black’
+	instance1.sayName;  // ‘Nical’
+	instance1.sayAge;  // 	  29
+	var instance2 = new SubType(‘Greg’, 21);
+	instance2.colors;      //‘red’,’blue’,’green’
+	instance2.sayName;  // ‘Greg’
+	instance2.sayAge;  // 	  21
+
+
+	这个方法是最常用的⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️
+
+==========
+
+	4，原型式继承
+	function object(o){
+		function F(){};
+		F.prototype = o;
+		return new F();
+	}
+	ES5有一个方法：Object.create()方法，等同于上面这个，这里的o是一个对象实例
+	
+==========
+
+	5，寄生式继承
+	function createAnother(original){
+		var clone = object(original);
+		clone.sayHi = function(){
+			alert(“hi”)
+		};
+		return clone
+	}
+
+==========
+	
+	6，寄生组合式继承
+	组合继承的缺点是，有两次调用超类型构造函数：第一次，SubType.prototype = new SuperType()会调用一次；第二次，在子类型的构造函数里写SuperType.call(this, name)。调用两次的后果是每一次调用都会重新创建实例属性，自动屏蔽原来的属性，所以用寄生组合式继承会避免这种情况：
+	function inheritPrototype(subType, superType){
+		var prototype = Object(superType.prototype);	//创建对象
+		prototype.constructor = subType;		//增强对象
+		subType.prototype = prototype;		//指定对象
+	}
+
+	例如：
+	function SuperType(name){
+		this.name = name;
+		this.colors = [“red”,”blue”,”green”]
+	}
+	SuperType.prototype.sayName = function(){
+		alert(this.name)
+	}
+	function SubType(name, age){
+		SuperType.call(this, name);
+		this.age = age;
+	}
+	
+	inheritPrototype(SubType, SuperType);
+
+	SubType.prototype.sayAge = function(){
+		alert(this.age)
+	}
+
+	寄生组合式继承是引用类型最理想的继承范式。⭐️⭐️⭐️⭐️⭐️
+	
+
+
+第7章 函数表达式
+	
+	函数声明提升只针对于函数声明，而函数表达式无效。
+
+===========
+	闭包：
+	是指有权访问另一个函数作用域中的变量的函数，（是一个函数）；
+	创建闭包的常见方式，就是在一个函数内部创建另一个函数。
+
+	在理解闭包之前，先要清楚一个函数在创建到调用再到结束后的一系列过程：
+	当一个函数被调用的时候，会先创建一个执行环境以及相应的作用域链，然后用arguments对象和其他命名参数的值来初始化函数的活动对象，但在作用域链中，外部函数的活动对象始终是排在第二，外部函数的外部函数的活动对象排在第三。。。。。。最后一个是全局执行环境下的活动对象。
+	以一个函数为例：
+	function compare(value1, value2){
+		return   ……
+	}
+	var result = compare(5, 10);
+	在创建函数compare()的时候，会先创建一个预先包含全局变量对象的作用域链，这个作用域链被保存在内部的[[Scope]]属性中，当调用compare()函数的时候，会为函数创建一个执行环境，然后通过复制[[Scope]]中的对象来构建起执行环境的作用域链，此后会将活动对象推到执行环境作用域链的前端。此时的compare()的作用域链上有两个变量对象，第一个是本地变量对象：arguments，value1，value2；第二个则是全局变量对象：result，compare。当函数执行完毕后，局部活动对象就会被销毁，只留下全局执行环境下的变量对象。
+	
+	但是闭包的情况又有所不同：
+	如果在函数内部再定义一个函数，则里面的函数会将外部函数的活动对象添加到它的作用域链中，但是它的作用域链的前端还是它自己的活动对象，后面依次是外部函数的活动对象，外部函数的外部函数的活动对象。。。。。直到全局执行环境下的变量对象。
+	function compare(value1, value2){
+		return function(name){
+			…….
+		}
+	}
+	var compareA = compare(1,2);
+	var result = compareA(“aaaa”);
+	当匿名函数在compare()中被返回之后，它的作用域链会被初始化，包含compare()的活动对象以及全局变量对象。当compare()执行完毕后，它的活动对象不会被销毁，因为匿名函数的作用域链仍然在引用这个活动对象。也就是说，compare()函数返回后，它的执行环境的作用域链会被销毁，但是它的活动对象仍然保留在内存中，直到匿名函数被销毁后，它的活动对象才会销毁。拿上面的例子来说明，当执行compare(1,2)的时候，如果没有闭包，则执行完后compare的执行环境就会被销毁，活动对象也不会保留在内存中，内存中只剩下全局变量对象，但是如果函数内部有闭包，此时里面的内部函数返回了，这时候初始化内部函数的作用域链，会保留内部函数外的活动对象（也就是compare的活动对象），还有全局变量对象在内存中，所以这时候，compare的活动对象还是可以访问的，没有被销毁，虽然此时的compare的作用域链已经销毁了。
+
+
+
+
+
+
+
+
+
+
+
+
 
