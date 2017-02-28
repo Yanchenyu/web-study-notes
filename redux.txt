@@ -1,0 +1,71 @@
+redux是一个单一的状态树，所有的state都以一个对象树的形式存储在一个单一的store中。
+
+这样说有点难理解，我来换个角度：
+比如我们有这么一个状态树{text: “hello world”}，这个状态树只有一个节点text，那么它对应的在html页面上是一个<p>hello world</p>，它表示这个标签的状态，什么状态？它的text为hello world，当我们把状态树改变的时候，{text: “hello stark”}，那么它代表的那个标签也会随之改变  <p>hello stark</p>，这就是redux的最基础的概念。这里的状态，在我理解为就是表示页面上某个元素的呈现的一种方式（包括它的属性以及值或者其他）。如果我们要修改页面上的东西，必须先修改这个状态树。
+用专业的术语来说，我们要做的就是用单个对象来描述页面的状态，然后通过修改这个对象来操控页面。
+
+下面是redux的几个核心概念：
+1，Action
+action，表示的是发生了什么事，它没有逻辑，只是代表不同时刻的不同的动作行为，我们在action.js里面会把这个页面可能出现的所有行为全部写死，提前定义好，具体的一个action：
+function changeText(text){
+	type: “CHANGE_TEXT”,
+	nextText: text
+}
+这个action表示我要去修改标题，type就是它的类型，什么类型？修改文本内容，那么修改成什么内容？nextText对应的值就是你要修改的文本内容，我们可以传参给它。在这里我可以理解为该动作对应的状态就是{nextText: text}
+再理解一下，我拿着一个单子（一个action），给下一个人（reducer），我告诉他，你要做什么，单子上写得很清楚，哦，是修改文本内容，并且要修改成什么内容我也给他了。
+
+
+2，Reducer
+reducer的任务是根据传入的action对象，去修改状态树。它接收当前的状态以及传入的action，返回一个新的状态。
+(state, action) => newState
+
+拿我们的例子来说：
+const initState = {
+	text: “hello world”
+}
+
+function Reducer(state = initState, action){
+	switch(action.type){
+		case “CHANGE_TEXT”:
+			return {
+				text: “hello stark”
+			}
+		default:
+			return state;
+	}
+}
+
+理解：下一个人（reducer）拿到了我们传给他的单子（action），告诉他你帮我修改一下text的内容，那么他会先看一下，当前的状态是什么？也就是说当前的text是什么值，我得先知道我再改，什么？你没传给我当前的状态？那我就默认是最开始的状态了，那我就根据你单子的类型我来看看我应该做什么，你是想改变文本这一动作，那我就返回一个新状态{text: “hello stark”}，而hello stark就是你刚刚给我的单子（action）上写的那个你的动作的结果。
+
+
+3，Store
+store是redux的核心，页面上所有的应用的状态都保存在store里面，他就是个对象树。那么自然他有几个方法：
+1，store.getState();    获得当前的状态
+2，store.dispatch(action);	   更新state
+3，subscribe(listener);	     注册监听器，这个用的比较少。
+
+
+那么我怎么能拿到store呢，
+import { createStore } from “redux”
+
+let store = createStore(Reducer);    //这里的Reducer，就是刚刚的那个人，注意，如果reducer比较多，那么一定是所有reducer的集合，有一个方法combineReducers()。这个createStore只写一次，就是一次性所有的reducer全部集合
+
+那么我怎么修改页面上的状态：
+store.dispatch( changeText() );
+store.getState();      //   {text: “hello stark”}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
