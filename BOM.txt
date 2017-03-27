@@ -1,0 +1,73 @@
+1，a未定义，
+a;     //报错
+window.a;    //undefined
+
+不能用delete删除全局变量
+
+2，html5不支持<frame>标签
+
+3，js中window对象的top，opener，parent，self属性（虽然对于window来说，它们是一种属性，但是也可以直接用他们作为对象）的区别：
+
+	top：该变更永远指分割窗口最高层次的浏览器窗口。如果计划从分割窗口的最高层次开始执行命令，就可以用top变量。
+	opener：用于在window.open的页面引用执行该window.open方法的的页面的对象。如果a页面使用了window.open()了b页面，那么我们在b页面要引用a页面，就可以使用opener对象，前提是必须是用window.open()方法打开的才能用；
+	parent：在iframe,frame中生成的子页面中访问父页面的对象。例如：A页面中有一个iframe或frame，那么iframe或frame中的页面就可以通过parent对象来引用A页面中的对象。这样就可以获取或返回值到A页面中。（不要和jquery的parent()方法混淆）
+	self：指当前窗口
+
+4，	网页可见区域宽：document.body.clientWidth 
+	网页可见区域高：document.body.clientHeight 
+	网页可见区域宽：document.body.offsetWidth (包括边线的宽) 
+	网页可见区域高：document.body.offsetHeight (包括边线的宽) 
+	网页正文全文宽：document.body.scrollWidth 
+	网页正文全文高：document.body.scrollHeight 
+	网页被卷去的高：document.body.scrollTop 
+	网页被卷去的左：document.body.scrollLeft 
+	网页正文部分上：window.screenTop 
+	网页正文部分左：window.screenLeft 
+	屏幕分辨率的高：window.screen.height 
+	屏幕分辨率的宽：window.screen.width 
+	屏幕可用工作区高度：window.screen.availHeight 
+	屏幕可用工作区宽度：window.screen.availWidth 
+
+5，prompt(que,ans);
+	que: 对话框的问题
+	ans: 默认答案
+
+6，location对象：
+	window.location === document.location;   //true
+	
+	location.hash;	   //URL中的hash
+	location.href;   //返回的是完整的URL，如果等于一个URL，就相当于跳转到这个URL上
+	location.host;	  //返回的是服务器名称和端口号(如果有)
+	location.hostname;  //不带端口号的服务器名称
+	location.port;		//端口号
+	location.protocol;	//页面使用的协议，”http:”或”https:”
+	location.search;	//URL查询的字符串，以问好开头的，可以用location.search.substring(1)，表示问号后面的所有字符串，这里的字符串是经过编码的，要用decodeURIComponent(str)来解码
+
+7，URI三种解码与编码的对比：
+	decodeURI() & encodeURI()：十六进制编码，如果url进行跳转，可以用它来编码，例如：Location.href=encodeURI(http://cang.baidu.com/do/s?word=百度&ct=21);
+
+	decodeURIComponent() & encodeURIComponent()：也是十六进制编码，但是比上面的要更复杂，更细，特殊符号也会转码，所以适用于作为参数来使用，例如：<script language="javascript">document.write('<a href="http://passport.baidu.com/?logout&aid=7&u='+encodeURIComponent ("http://cang.baidu.com/bruce42")+'">退出</a>');</script>
+
+	escape()  & unescape()：不推荐使用
+
+8，位置操作：
+	location.href= “url”;	//推荐使用
+	location.assign= “url”;   //等同于上面
+	location.replace(“url”);		//跳转后不能后退
+	location.reload(); 		//重新加载
+	
+9，navigator对象：
+	主要是针对于客户端浏览器的一些属性，多的不说了，
+	navigator.onLine;   //是否连网
+	navigator.appName;	//浏览器完整名字
+
+10，screen对象：
+	最常用的就是分辨率了：
+	window.screen.width/height
+
+11，history对象：
+	history.go(-1);	//后退一页
+	history.go(1);		//前进一页
+	history.back();	//后退一页
+	history.forward();	//前进一页
+

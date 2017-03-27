@@ -1,0 +1,9 @@
+1，ssh root@120.25.69.229:3000
+
+2，输入密码
+
+3，su app
+
+4，cd /home/app/bin
+
+5，./update.sh
