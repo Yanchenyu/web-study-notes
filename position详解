@@ -17,3 +17,14 @@ absolute会参照非static的父元素或祖先元素来定位，如果没有找
 fixed是根据窗口为原点进行偏移定位的，不会根据滚动条而滚动。
 
 使用static 定位或无position定位的元素z-index属性是无效的。而且父子元素的z-index一定是父在子上面，哪怕子元素的层级大于父元素
+
+在安卓平台上，弹出的软键盘会把所有的position-fixed顶上去，absolute应该也会，解决方法是监听window.onresize事件，在vue里面就是放到mounted里面，如果触发了，就直接把底部的那个容易顶上去的那部分display设置为none。
+var h=$(window).height();
+    $(window).resize(function() {
+        if($(window).height()<h){
+            $('.footer').hide();
+        }
+        if($(window).height()>=h){
+            $('.footer').show();
+        }
+    });
