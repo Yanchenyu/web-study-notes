@@ -1,0 +1,30 @@
+文档流：将窗体自上而下分成一行行, 并在每行中按从左至右的顺序排放元素,即为文档流。
+只有三种情况会使得元素脱离文档流，分别是：浮动、绝对定位和相对定位。
+
+relative就是相对于它自己本身所在文档流中的位置而发生偏移，因为默认是static，所以relative就是相对于它static的所在位置。最重要的是它还占用文档空间，也就是说它后面如果还有其他元素，那么就会按照文档流继续排在那个元素的static状态时所在的位置的后面。这个比较重要！！！而margin会让元素的原来的文档空间发生变化，padding不会
+
+absolute会参照非static的父元素或祖先元素来定位，如果没有找到，则参照html元素；而最外层的static和relative都是相对于body，如果使用absoulte或fixed定位的话，必须指定 left、right、 top、 bottom 属性中的至少一个，否则left/right/top/bottom属性会使用它们的默认值 auto ，这将导致对象遵从正常的HTML布局规则，在前一个对象之后立即被呈递，简单讲就是都变成relative，会占用文档空间，这点非常重要，很多人使用absolute定位后发现没有脱离文档流就是这个原因，这里要特别注意~~~
+
+我们同时设置了top和bottom的属性值，那元素又该往哪偏移好呢？记住下面的规则：
+
+如果top和bottom一同存在的话，那么只有top生效。
+如果left和right一同存在的话，那么只有left生效。
+
+如果祖先元素的margin或者padding发生变化，那么absolute会发生变化吗？只有是margin的才会变化，而padding不会对其有影响。
+
+绝对(absolute)定位对象在可视区域之外会导致滚动条出现。而放置相对(relative)定位对象在可视区域之外，滚动条不会出现。因为文档空间不变；
+
+fixed是根据窗口为原点进行偏移定位的，不会根据滚动条而滚动。
+
+使用static 定位或无position定位的元素z-index属性是无效的。而且父子元素的z-index一定是父在子上面，哪怕子元素的层级大于父元素
+
+在安卓平台上，弹出的软键盘会把所有的position-fixed顶上去，absolute应该也会，解决方法是监听window.onresize事件，在vue里面就是放到mounted里面，如果触发了，就直接把底部的那个容易顶上去的那部分display设置为none。
+var h=$(window).height();
+    $(window).resize(function() {
+        if($(window).height()<h){
+            $('.footer').hide();
+        }
+        if($(window).height()>=h){
+            $('.footer').show();
+        }
+    });
