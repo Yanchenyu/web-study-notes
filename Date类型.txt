@@ -8,3 +8,5 @@ nowTime.getDay()+1;    //返回星期几，因为是0-6；
 nowTime.getHours();   //返回小时数，0-23；
 nowTime.getMinutes();  //分钟，0-59；
 nowTime.getSeconds();  //秒，0-59；
+
+只有时分秒才有s结尾的复数形式

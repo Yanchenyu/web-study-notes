@@ -8,7 +8,7 @@ DOM是针对HTML和XML文档的API，根据W3C的HTML DOM标准，html文档中�
 	3.代表文本，一个空格，一个回车都是代表#text节点
 	9.代表document文档
 
-如果nodeType=1，则nodeName就是标签名，注意这里是大写的（如“DIV”），nodeValue始终是null。
+如果nodeType=1，元素节点，则nodeName就是标签名，注意这里是大写的（如“DIV”），nodeValue始终是null。
 
 注意：nodeValue和innerHTML的区别
 	nodeValue指的是当前节点的值，这个节点是具体的，如果只是一个元素节点，那么没有任何值，它下面的子节点的值是它子节点的nodeValue，而且这个nodeValue包括所有的内容，像换行符也会包括，不是它的，所以它为null；而innerHTML指的是该节点下所有的子节点的字符串形式，包括它们的值。
@@ -61,7 +61,6 @@ function convertToArray(nodeList){
 	}
 	return array
 }
-
 
 3，节点属性：
 
@@ -126,7 +125,7 @@ someNode.attributes.setNamedItem(node);	//设置一个新的节点，这个用�
 document.createElement()	//元素节点
 document.createTextNode()	//文本节点
 
-8，Text类型（所有的方法都是基于文本节点）
+8，Text类型（所有的方法都是基于文本节点，offset、count都是数字，text是字符串）
 
 appendData(text): 将text文本添加到节点末尾
 deleteData(offset, count): 从offset的位置开始删除count个字符
@@ -208,13 +207,41 @@ div.dataset.myname = 123;   设置自定义属性值
 
 
 7，innderHTML属性
-返回子节点所有的内容，包括元素、注释、文本，但是IE和Opera返回的是大写的，所以不同的浏览器返回的也不同。
+返回子节点所有的内容，包括元素、注释、文本，但是IE和Opera返回的是大写的，所以不同的浏览器返回的也不同。不是所有的元素都有这个属性，像table相关的都不支持这个。
+
+8，outerHTML
+返回的是包含当前节点的所有内容
+
+9，insertAdjacentHTML()方法，两个参数
+
+element.insertAdjacentHTML(“beforebegin”, “<p>hello</p>”);		//作为前一个同辈元素插入，就是同级
+element.insertAdjacentHTML(“afterbegin”, “<p>hello</p>”);		//作为第一个子元素插入，是在子节点里面
+element.insertAdjacentHTML(“beforeend”, “<p>hello</p>”);		//作为最后一个子元素插入，也是在子节点里面
+element.insertAdjacentHTML(“afterend”, “<p>hello</p>”);		//作为后一个同辈元素插入
 
 
+10，scrollIntoView();
+	someNode.scrollIntoView(); 		//如果不传参数或者传true，默认节点的顶端与视口顶部平行，如果传false，默认节点的底部与视口顶部平行
 
+11，children属性：
+和childNodes差别，children只包含元素子节点，IE9以后是只包含元素节点，IE8及之前也包含注释节点
 
+12，contains(someNode)：检测某节点下是否包含此子节点
 
+DOM3级，类似方法：compareDocumentPosition(someNode)，返回值
+	1	//无关
+	2 	//居前（在参考节点之前）
+	4 	//居后
+	8	//包含（给定节点是参考节点的祖先）
+	16 	//被包含（是子节点，等同于contains）
 
+13，innerText，Firefox不支持，
+和innerHTML区别，一个返回的是纯文本，不包含元素节点标签等，一个返回的html代码，包含所有节点
 
+14，outerText
+	div.outerText = “hello world”;
+等同于
+	var text = document.createTextNode(“hello world”)
+	div.parentNode.replaceChild(text, div)
 
 

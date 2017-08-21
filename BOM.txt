@@ -4,7 +4,7 @@ window.a;    //undefined
 
 不能用delete删除全局变量
 
-2，html5不支持<frame>标签
+2，html5不支持<frame>标签，但是支持<iframe>标签
 
 3，js中window对象的top，opener，parent，self属性（虽然对于window来说，它们是一种属性，但是也可以直接用他们作为对象）的区别：
 

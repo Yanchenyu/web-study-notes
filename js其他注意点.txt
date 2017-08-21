@@ -10,7 +10,7 @@ function factorial(num){
 2，call和apply的异同：
 相同：都是在特定的作用域中调用函数，实际上等于设置函数体内this对象的值，扩充函数作用域；
 不同：apply()接受两个参数，一个作用域，一个参数数组（也可以是arguments），   apply(this, [array]);
-     call()接受两个参数，一个作用域，一个所有参数实例，要列出来
+     call()接受两个参数，一个作用域，一个所有参数实例，要列出来，call嘛，叫出来
 
 还有一个方法，是bind()，例：
 window.color = ‘blue’;
@@ -57,10 +57,10 @@ Math.round()  ,标准舍入
 Math.random(),   [0,1)之间的随机数
 
 如果想选择一个1到10的随机数：
-var num = Math.floor(Math.random() * 10 + 1);
+Math.random()*10
 
 如果想选择一个1到10的整数：
-parseInt(num);
+Math.floor(Math.random() * 10 + 1);
 
 
 Math.abs(num)   ,绝对值

@@ -12,6 +12,7 @@ unshift()，数组前端添加，返回长度
 （这两个就是操作的数组的头部）
 
 添加的方法（unshift(…)，push(...)）永远是返回长度，删除的方法（shift()，pop()）永远是返回的删除的项
+头部移除只有pop，头部添加只有unshift（unshit，非屁股），无论是数组头部还是尾部，添加或者删除只有一种方法
 
 3，reverse()，将数组直接倒序
 sort()，对数组按字符串排列
@@ -91,12 +92,12 @@ var a = [1,2,3,4,5,6],
 
 		for(var i = a.length-1 ; i>=0; i--){
 			var arr1 = a[i];
-			for(var j = b.length-1 ; j>=0;j—){
+			for(var j = b.length-1 ; j>=0;j—-){
 				var arr2 = b[j];
 				if(arr1==arr2){
 					a.splice(i,1);
 					b.splice(j,1);
-					break
+					break 			//注意，这里的break是退出当前的for循环
 				}
 			}
 		}

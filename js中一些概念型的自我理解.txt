@@ -5,7 +5,7 @@
 2，复制变量值的时候，如果改变复制的值，那么原来的值是否会变化？
 这个取决于原来的值是什么类型：
 	1.基本类型值：只是存在于栈内存中，如果复制，相当于栈内存里又多了一个值，两者相互独立，改变其中一个，另一个不变
-	2.引用类型值：实际上是指向堆内存中的一个object，复制相当于多了一个指针，也是指向这个object，改变其中一个，所指的这个object也发生改变（注意，这个object不是整个大的Object对象，而只是其中的一小个），那么所有指向该object的值全部发生变化。
+	2.引用类型值：实际上是指向堆内存中的一个object，复制相当于多了一个指针，也是指向这个堆内存中的一小块object，改变其中一个，所指的这个object也发生改变（注意，这个object不是整个大的Object对象，而只是堆内存其中的一小个），那么所有指向该object的值全部发生变化。
 
 3，传递参数的时候，如果参数在局部作用域下发生变化，那么参数会变化吗？
 js中，所有的参数传递都是按值传递，不管是基本类型还是引用类型。不同的类型下不同的讨论方式：
@@ -111,12 +111,14 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 
 （理解原型对象：
 
-	只要创建了一个函数(Person)，就会为这个函数(Person)自动创建一个prototype属性，这个属性指向该函数的原型对象。这个原型对象会自动获得一个constructor(构造函数)属性，指向该函数(Person)。（这里我们可以猜想函数的原型对象构造了函数，但是下面写了一个函数的实例也有一个构造函数属性指向了函数，那这个说法就不通了）
+	只要创建了一个函数(Person)，就会为这个函数(Person)自动创建一个prototype属性，这个属性指向该函数的原型对象。这个原型对象会自动获得一个constructor(构造函数)属性，指向该函数(Person)。（初来理解：这里我们可以猜想函数的原型对象构造了函数，但是下面写了一个函数的实例也有一个构造函数属性指向了函数，那这个说法就不通了）（第二次理解：再读的时候发现可以理解通，其实总结起来很简单，一句话，被构造的东西.constructor === 构造它的东西，比如说下面的第一行代码，Person.prototype哪里来的，就是Person在创建的时候自动构造出来的，也就是说Person.prototype是Person这个函数构造出来的，所以第一行成立！第二三行，person1是怎么出来的，是Person这个函数构造出来的，所以person1.constractor===Person）
 	
 	Person.prototype.constructor === Person;  //true
 	var person1 = new Person();
 	person1.constructor === Person;  //true
-	为什么person1也有constructor属性指向Person，因为继承了原型对象。
+	(这里我不太理解第一次为什么理解错了，person1这个实例就是由Person这个构造函数构造出来的，那么person1的constructor属性就是指向的Person这个构造函数啊，没毛病，跟继承没什么关系啊)
+
+	constructor属性指向的是Person构造函数，不管是它的原型对象还是它的创建的实例，它们的constructor属性都会指向Person。
 
 	字符表示：
 	Person.prototype  ——> Person Prototype(原型对象)，Person Prototype(原型对象).constructor  ——>Person
@@ -208,7 +210,7 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 	Person.prototype = {
 		name: ‘Nical’
 	};
-	//这里重写了Person的原型对象，此时，Person原型对象的构造函数属性已经不再指向Person了，同样，由Person新建的实例的构造函数属性也不再指向Person了，二者的constructor属性都指向Object了。
+	//这里重写了Person的原型对象，此时，Person原型对象的构造函数属性已经不再指向Person了，同样，由Person新建的实例（注意，这里是新建的，也就是说是在重写之后新建的，如果是在重写之前就已经建立了新的实例，那么构造函数属性依然指向Person）的构造函数属性也不再指向Person了，二者的constructor属性都指向Object了。
 	Person.prototype.constructor === Person;     //false
 	Person.prototype.constructor === Object;     //true
 	var person1 = new Person();
@@ -356,9 +358,9 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 	Person1.prototype = new Person2();
 	
 
-	Person1.prototype.__proto__ === Person2.prototype;   // true
-	Person1.prototype.constructor === Person1;   //false，因为Person1的prototype重写了。
-	person1.constructor === Person1;  // true，因为此时Person1的原型对象已经不是最初的了，所以person1不会继承新的原型对象，所以它的constructor还是指向Person1；
+	Person1.prototype.__proto__ === Person2.prototype;   // true 等同于person1.__proto__.__proto__ === Person2.prototype; //true
+	Person1.prototype.constructor === Person1;   //false，因为Person1的prototype重写了，Person1的原型对象被当作了Person2的实例，所以应该指向Person2，即Person1.prototype.constructor === Person2
+	person1.constructor === Person1;  // true，因为此时Person1的原型对象已经不是最初的了，所以person1不会继承新的原型对象，所以它的constructor还是指向Person1；如果这个person1实例是在原型对象重写之后新建的话，那么constructor就不会指向Person1了。
 
 	这是跟写法有关的，如果我们换一种写法：
 
@@ -373,7 +375,7 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 	A.prototype.__proto__ === B.prototype;   //true
 	a.__proto__.__proto__ === B.prototype;   // true
 
-	此时的A.prototype已经被重写了，所以a和A原型对象的constructor属性都指向B，而不是A；所谓的继承就是A的原型对象会继承构造函数B的原型对象的所有方法和属性。所以搜索一个实例的属性，三步：1，先在该实例中寻找该属性，2，如果没有则会在该实例的构造函数的原型对象中搜索，3，如果没有则会在该实例的原型对象的构造函数的原型对象中搜索。
+	此时的A.prototype已经被重写了，所以a和A原型对象的constructor属性都指向B，而不是A；所谓的继承就是A的原型对象会继承构造函数B的原型对象的所有方法和属性。所以搜索一个实例的属性，三步：1，先在该实例中寻找该属性，2，如果没有则会在该实例的构造函数的原型对象中搜索，3，如果没有则会在该实例的原型对象的构造函数的原型对象中搜索。继承都是原型对象继承原型对象。
 
 	默认的原型：
 	所有引用类型都继承了Object的方法，这也是通过原型链来实现的，所有函数的原型对象默认都是Object的实例，当然也会继承，所以上面的代码可以接着写：
@@ -544,7 +546,7 @@ js中，所有的参数传递都是按值传递，不管是基本类型还是引
 	创建闭包的常见方式，就是在一个函数内部创建另一个函数。
 
 	在理解闭包之前，先要清楚一个函数在创建到调用再到结束后的一系列过程：
-	当一个函数被调用的时候，会先创建一个执行环境以及相应的作用域链，然后用arguments对象和其他命名参数的值来初始化函数的活动对象，但在作用域链中，外部函数的活动对象始终是排在第二，外部函数的外部函数的活动对象排在第三。。。。。。最后一个是全局执行环境下的活动对象。
+	当一个函数被调用的时候，会先创建一个执行环境以及相应的作用域链，然后用arguments对象和其他命名参数的值来初始化函数的活动对象，但在作用域链中，外部函数的活动对象始终是排在第二，外部函数的外部函数的活动对象排在第三。。。。。。最后一个是全局执行环境下的活动对象。（一圈一圈往外）
 	以一个函数为例：
 	function compare(value1, value2){
 		return   ……
