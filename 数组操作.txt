@@ -109,3 +109,19 @@ var a = [1,2,3,4,5,6],
 例：var text = “red,blue,yellow,green”;
    var text1 = text.split(“,”);    //[‘red’,’blue’,’yellow’,’green’];
    var text2 = text.split(“,”, 2);    //[‘red’,’blue’]
+
+截取部分字符串
+
+x=字符串.substr(起始字符编号, 返回值的长度);
+
+假如我们有一个字符串abc。
+
+①我们想要获得第1个字符，这么写：x= "abc".substr(0,1);
+
+②假如我们想要获得第1，2个字符，这么写：x= "abc".substr(0,2);
+
+③假如我们想要获得第2，3个字符，这么写：x = "abc".substr(1,2);
+
+④假如我们想要获得第2个字符之后所有字符，这么写：x ="abc".substr(1);
+
+⑤假设我们要获得第5个字符（字符串长度至少需要5），这么写：x= 字符串.substr(4,1);
